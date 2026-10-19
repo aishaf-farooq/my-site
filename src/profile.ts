@@ -16,40 +16,41 @@
 
 export const profile = {
   /** Your name as you want it to appear everywhere. */
-  displayName: "Your Name",
+  displayName: "Aisha Farooq",
 
   /** Your UD email — must match the one you signed into the course with. */
-  email: "you@udel.edu",
+  email: "aishaf@udel.edu",
 
   /** Where you're from. Shows on your roster card and /about. */
-  hometown: "Newark, Delaware",
+  hometown: "Wilmington, Delaware",
 
   /**
    * 2 to 4 fun facts (the grader checks the count!). Real ones: they're
    * how classmates find something to say hello about.
    */
   funFacts: [
-    "I once assembled IKEA furniture without leftover screws.",
-    "I can name every U.S. state capital in under two minutes.",
+    "I cannot swim",
+    "I can speak 4 different languages",
+    "I can do henna",
   ],
 
   /** One decision you're proud of, in a sentence. */
   decisionImProudOf:
-    "I chose to take a gap semester to work retail; it taught me more about customers than any textbook.",
+    "I stopped bleaching my eyebrows as someone with pitch black hair because I wanted to embrace my natural hair color.",
 
   /**
    * Your photo. Replace public/photo.svg with a real photo of you
    * (e.g. put photo.jpg in the public/ folder and change this to "/photo.jpg").
    * It must be a real image file: the grader fetches it and checks.
    */
-  photoPath: "/photo.svg",
+  photoPath: "/IMG_8097.jpg",
 
   /**
    * Who can see your roster card:
    *   "class"          — your classmates and the professor (recommended)
    *   "professor-only" — just the professor
    */
-  rosterVisibility: "class" as "class" | "professor-only",
+  rosterVisibility: "class",
 
   /** A one-line tagline for your home page. Make it yours. */
   tagline: "Building a portfolio of decision services, one lane at a time.",

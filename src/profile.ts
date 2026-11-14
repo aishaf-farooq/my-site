@@ -32,6 +32,7 @@ export const profile = {
     "I cannot swim",
     "I can speak 4 different languages",
     "I can do henna",
+    "I love to bake in my free time"
   ],
 
   /** One decision you're proud of, in a sentence. */

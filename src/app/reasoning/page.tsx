@@ -5,30 +5,15 @@ import { BernoulliFourViews } from "@/components/reasoning/BernoulliFourViews";
 
 export const metadata = { title: "Reasoning & Uncertainty Service" };
 
-/**
- * ── Challenge 2, step 5: the face ─────────────────────────────────────────
- * Why this page exists: an API decides, a page justifies. The grader reads
- * the three data-reasoning="..." numbers below and checks each one matches
- * the answer your API gave moments earlier. Everything else on the page is
- * for humans: the tables and views that show WHY each number is right.
- *
- * The wiring ships with the template. Your job when you take on Challenge 2:
- * run supabase/reasoning.sql, build the decide route, then make this page
- * yours. The TODO(yours) comments mark the sentences to rewrite in your own
- * words; the build guide (course book, end of Lane 2) explains every part.
- */
-
 // Freshness contract: without this line, Next.js may serve a cached copy of
 // this page, and the grader would see stale numbers seconds after your API
 // answered. force-dynamic re-renders the page on every request.
 export const dynamic = "force-dynamic";
 
 export default async function ReasoningPage() {
-  // The same rows your /api/reasoning/decide wrote via saveLatest().
   const { syllogism, plausibility, bernoulli } = await loadLatest();
 
-  // Until the first probe arrives (or before Supabase is wired up), the
-  // portfolio card keeps its honest placeholder.
+  // Until the first probe arrives, keep the honest placeholder.
   if (!syllogism && !plausibility && !bernoulli) {
     return (
       <ComingSoon
@@ -45,13 +30,13 @@ export default async function ReasoningPage() {
         Lane 2 · live decision service
       </p>
       <h1 className="mt-3 text-4xl font-bold">My Reasoning &amp; Uncertainty Service</h1>
-      {/* TODO(yours): one sentence, your words, on what this service does. */}
       <p className="mt-4 max-w-prose text-muted">
-        Below is the most recent problem my API solved, for each of the three problem types it
-        speaks. Every number on this page comes from the same live data my API answered with.
+        This service checks whether an argument actually holds up, updates how likely something
+        is when new evidence comes in, and figures out what a risky bet is worth on average.
+        Below is the most recent problem my API solved for each type, and every number here
+        comes from the same live data my API answered with.
       </p>
 
-      {/* ── Latest syllogism audit ─────────────────────────────────────── */}
       <section className="mt-12">
         <h2 className="text-2xl font-bold">Latest syllogism audit</h2>
         {syllogism ? (
@@ -73,13 +58,12 @@ export default async function ReasoningPage() {
                 <span className="text-muted"> ({syllogism.answer.fallacy})</span>
               )}
             </p>
-            {/* TODO(yours): rewrite this explanation so it sounds like you (Station 2.1). */}
             <p className="mt-2 max-w-prose text-sm text-muted">
-              How the service decided: it ignores the story and reads only the shape of
-              the argument. The rule promises that the if-part brings the then-part, so
-              only two observations prove anything: the if-part being true, or the
-              then-part being false. Every other shape proves nothing, no matter how
-              believable the story feels.
+              How it decided: the service skips the story and only looks at the structure. An
+              "if A, then B" rule only lets you conclude something in two cases. If A happens,
+              B has to follow, and if B didn't happen, A couldn't have either. Seeing B or
+              seeing that A didn't happen proves nothing, even when the conclusion sounds
+              believable.
             </p>
           </div>
         ) : (
@@ -87,7 +71,6 @@ export default async function ReasoningPage() {
         )}
       </section>
 
-      {/* ── Latest plausibility update ─────────────────────────────────── */}
       <section className="mt-12">
         <h2 className="text-2xl font-bold">Latest plausibility update</h2>
         {plausibility ? (
@@ -107,15 +90,18 @@ export default async function ReasoningPage() {
                 {Number(plausibility.answer.posterior).toFixed(3)}
               </strong>
             </p>
-            {/* TODO(yours): one sentence a manager could read, e.g. what this
-                posterior means for the flagged case (Station 2.3). */}
+            <p className="mt-2 max-w-prose text-sm text-muted">
+              In plain terms: when something gets flagged, there's about a{" "}
+              {(Number(plausibility.answer.posterior) * 100).toFixed(0)}% chance it's the real
+              thing. When the base rate is low, false alarms from the much bigger clean group can
+              outnumber the true catches, so a flag is a reason to look closer, not proof.
+            </p>
           </div>
         ) : (
           <p className="mt-3 text-muted">No plausibility probe yet.</p>
         )}
       </section>
 
-      {/* ── Latest Bernoulli read ──────────────────────────────────────── */}
       <section className="mt-12">
         <h2 className="text-2xl font-bold">Latest Bernoulli read: four views</h2>
         {bernoulli ? (
@@ -139,8 +125,11 @@ export default async function ReasoningPage() {
                 {Number(bernoulli.answer.probabilityStatement).toFixed(2)}
               </span>
             </p>
-            {/* TODO(yours): one sentence on what the expected payoff does and
-                does not promise (Station 2.4). */}
+            <p className="mt-2 max-w-prose text-sm text-muted">
+              The expected payoff is what this bet averages out to per try if you repeat it many
+              times. It doesn't promise anything about a single try, which always pays either
+              the success amount or the failure amount, never the average.
+            </p>
           </div>
         ) : (
           <p className="mt-3 text-muted">No Bernoulli probe yet.</p>

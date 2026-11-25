@@ -1,59 +1,73 @@
-/**
- * The two-way table behind a plausibility update (Station 2.3's counting
- * method, drawn instead of computed). Why it exists: a posterior with no
- * table is just a number someone claims; the table shows a reader exactly
- * where the number comes from. Imagine 10,000 cases and count who lands in
- * each cell. The posterior is then read straight off the "flagged" column:
- * true flags divided by all flags.
- */
-export function TwoWayTable({
-  baseRate,
-  hitRate,
-  falseAlarmRate,
-}: {
+// Station 2.3's counting method, drawn as a two-way table from live data.
+// Imagine 10,000 cases, split them by "has the condition" and "got flagged",
+// then read the posterior straight off the Flagged column.
+
+interface TwoWayTableProps {
   baseRate: number;
   hitRate: number;
   falseAlarmRate: number;
-}) {
-  const N = 10_000;
-  const trueFlagged = Math.round(N * baseRate * hitRate);
-  const trueMissed = Math.round(N * baseRate * (1 - hitRate));
-  const falseFlagged = Math.round(N * (1 - baseRate) * falseAlarmRate);
-  const truePassed = Math.round(N * (1 - baseRate) * (1 - falseAlarmRate));
-  const flaggedTotal = trueFlagged + falseFlagged;
+}
 
-  const cell = "border border-line px-3 py-2 text-right tabular-nums";
-  const head = "border border-line bg-surface px-3 py-2 text-left font-semibold";
+const N = 10000;
+
+function fmt(n: number): string {
+  return Math.round(n).toLocaleString("en-US");
+}
+
+export function TwoWayTable({ baseRate, hitRate, falseAlarmRate }: TwoWayTableProps) {
+  const hasCondition = N * baseRate;
+  const clean = N - hasCondition;
+  const trueFlags = hasCondition * hitRate;
+  const missed = hasCondition - trueFlags;
+  const falseFlags = clean * falseAlarmRate;
+  const cleanPassed = clean - falseFlags;
+  const totalFlagged = trueFlags + falseFlags;
+  const totalNotFlagged = missed + cleanPassed;
+
+  const cell = "border border-black/10 px-3 py-2 text-right tabular-nums dark:border-white/15";
+  const head = "border border-black/10 px-3 py-2 text-left font-semibold dark:border-white/15";
 
   return (
-    <figure className="mt-4">
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr>
-            <th className={head}>Out of {N.toLocaleString()} cases</th>
-            <th className={`${head} text-right`}>Flagged</th>
-            <th className={`${head} text-right`}>Not flagged</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className={`${cell} text-left font-medium`}>Actually the condition</td>
-            <td className={`${cell} font-bold text-accent`}>{trueFlagged.toLocaleString()}</td>
-            <td className={cell}>{trueMissed.toLocaleString()}</td>
-          </tr>
-          <tr>
-            <td className={`${cell} text-left font-medium`}>Not the condition</td>
-            <td className={`${cell} font-bold`}>{falseFlagged.toLocaleString()}</td>
-            <td className={cell}>{truePassed.toLocaleString()}</td>
-          </tr>
-        </tbody>
-      </table>
-      <figcaption className="mt-2 text-sm text-muted">
-        The flag arrived, so only the &ldquo;Flagged&rdquo; column matters now:{" "}
-        {trueFlagged.toLocaleString()} real cases out of {flaggedTotal.toLocaleString()} flags in
-        total. That ratio, {trueFlagged.toLocaleString()} / {flaggedTotal.toLocaleString()}, is the
-        posterior. The table is why the number is right.
-      </figcaption>
-    </figure>
+    <div className="mt-4">
+      <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+        Imagine {fmt(N)} cases
+      </p>
+      <div className="mt-2 overflow-x-auto">
+        <table className="w-full max-w-xl border-collapse text-sm">
+          <thead>
+            <tr>
+              <th className={head}></th>
+              <th className={`${head} text-right`}>Flagged</th>
+              <th className={`${head} text-right`}>Not flagged</th>
+              <th className={`${head} text-right`}>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th className={head}>Has the condition</th>
+              <td className={`${cell} font-semibold text-accent`}>{fmt(trueFlags)}</td>
+              <td className={cell}>{fmt(missed)}</td>
+              <td className={cell}>{fmt(hasCondition)}</td>
+            </tr>
+            <tr>
+              <th className={head}>Clean</th>
+              <td className={cell}>{fmt(falseFlags)}</td>
+              <td className={cell}>{fmt(cleanPassed)}</td>
+              <td className={cell}>{fmt(clean)}</td>
+            </tr>
+            <tr>
+              <th className={head}>Total</th>
+              <td className={`${cell} font-semibold`}>{fmt(totalFlagged)}</td>
+              <td className={cell}>{fmt(totalNotFlagged)}</td>
+              <td className={cell}>{fmt(N)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-2 text-sm text-muted">
+        Read the Flagged column: {fmt(trueFlags)} real cases out of {fmt(totalFlagged)} flags
+        = {totalFlagged > 0 ? (trueFlags / totalFlagged).toFixed(3) : "n/a"}.
+      </p>
+    </div>
   );
 }
